@@ -11,7 +11,7 @@ class square:
     """
 
     def __init__(self, size=0):
-        """ Square class constructor method """
+        """ Constructor method for the Square class """
         self.__size = size
 
     @property
