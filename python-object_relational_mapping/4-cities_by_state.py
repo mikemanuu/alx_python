@@ -12,6 +12,6 @@ if __name__ == '__main__':
     cur = db.cursor()
     cur.execute("SELECT `cities`.`id`, `cities`.`name`, `states`.`name` \
                  FROM `cities` INNER JOIN `states`\
-                ON `c`.`state_id` = `s`.`id` \
-                ORDER BY `c`.`id`")
+                ON `cities`.`state_id` = `states`.`id` \
+                ORDER BY `cities`.`id`")
     [print(city) for city in cur.fetchall()]
