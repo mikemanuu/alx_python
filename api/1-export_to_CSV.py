@@ -6,7 +6,7 @@ import requests
 import sys
 
 
-def get_employee_data(employee_id):
+def get_employee_todo_progress(employee_id):
     """
     Fetches employee todo list and export it to a csv file.
     Args:
@@ -36,7 +36,7 @@ def get_employee_data(employee_id):
 
         # Display todo list progress
         print(
-            f"Employee {user_name}is done with tasks({completed_tasks}/{total_tasks}):")
+            f"Employee {user_name} is done with tasks({completed_tasks}/{total_tasks}):")
         for task in todo_data:
             if task["completed"]:
                 print(f"{task['title']}")
@@ -46,12 +46,10 @@ def get_employee_data(employee_id):
         with open(csv_file_name, mode='w', newline='') as csv_file:
             csv_writer = csv.writer(csv_file, quoting=csv.QUOTE_MINIMAL)
             csv_writer.writerow(
-                ["USER_ID", "USERNAME", "TASK_COMPLETED_STATUS", "TASK_TITLE"]
-            )
+                ["USER_ID", "USERNAME", "TASK_COMPLETED_STATUS", "TASK_TITLE"])
             for task in todo_data:
                 csv_writer.writerow(
-                    [user_id, user_name, str(task["completed"]), task["title"]]
-                )
+                    [user_id, user_name, str(task["completed"]), task["title"]])
 
         print(f"Data exported to {csv_file_name}")
     except requests.exceptions.RequestException as e:
@@ -61,13 +59,13 @@ def get_employee_data(employee_id):
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:
-        print("Usage: python3 1-expoert_tp_CSV.py <employee_id>")
+        print("Usage: python3 1-export_to_CSV.py <employee_id>")
         sys.exit(1)
 
     try:
         employee_id = int(sys.argv[1])
     except ValueError:
-        print("Error: Employe ID must be an integer.")
+        print("Error: Employee ID must be an integer.")
         sys.exit(1)
 
-    get_employee_data(employee_id)
+    get_employee_todo_progress(employee_id)
