@@ -7,61 +7,67 @@ import sys
 
 
 def get_employee_data(employee_id):
-    """ Define api urls for employee's details and to_do list. """
-    employee = f"https://jsonplaceholder.typicode.com/users/{employee_id}"
-    to_do = f"https://jsonplaceholder.typicode.com/users/{employee_id}/todos"
+    """
+    Fetches employee todo list and export it to a csv file.
+    Args:
+        employee_id(int): The id of the employee.
+    Returns:
+        None
+    """
+    # Define api urls for employee's details and to_do list.
+    user_url = f"https://jsonplaceholder.typicode.com/users/{employee_id}"
+    todo_url = f"https://jsonplaceholder.typicode.com/users/{employee_id}/todos"
 
-    """ Fetch employee details and to_do list. """
-    employee_response = requests.get(employee)
-    to_do_response = requests.get(to_do)
+    try:
 
-    """ Check if requests are successful. """
-    if employee_response.status_code == 200 and to_do_response.status_code == 200:
-        employee_data = employee_response.json()
-        to_do_data = to_do_response.json()
+        # Fetch user information
+        user_response = requests.get(user_url)
+        user_data = user_response.json()
+        user_id = user_data.get("id", "Unknown")
+        user_name = user_data.get("name", "Unknown")
 
-        """ Check if user_id and user_name are 25 characters long. """
-        user_id = f"{employee_id:025}"
-        user_name = f"{employee_data['username'][:25]:<25}"
+        # Fetch user todo list
+        todo_response = requests.get(todo_url)
+        todo_data = todo_response.json
 
-        """ Calculate no. of completed tasks. """
-        completed_tasks = len(
-            [task for task in to_do_data if task["completed"]])
-        total_tasks = len(to_do_data)
+        # Calculate the no of completed and total tasks
+        total_tasks = len(todo_response)
+        completed_tasks = sum(1 for task in todo_data if task["completed"])
 
-        """ Display to_do list progesss. """
-        print(f"UserId and Username: {user_id} - {user_name}")
+        # Display todo list progress
         print(
-            f"Employee {employee_data['name']} is done with tasks({completed_tasks}/{total_tasks}):")
+            f"Employee {user_name}is done with tasks({completed_tasks}/{total_tasks}):")
+        for task in todo_data:
+            if task["completed"]:
+                print(f"{task['title']}")
 
-        """ Write data to a csv file. """
+        # Export data to csv
         csv_file_name = f"{user_id}.csv"
         with open(csv_file_name, mode='w', newline='') as csv_file:
-            fieldnames = ["USER_ID", "USERNAME",
-                          "TASK_COMPLETED_STATUS", "TASK_TITLE"]
-            writer = csv.DictReader(csv_file, fieldnames=fieldnames)
-
-            writer.writeheader()
-
-            # write the tasks in a row
-            for task in to_do_data:
-                writer.writerow({
-                    "USER_ID": user_id,
-                    "USERNAME": user_name,
-                    "TASK_COMPLETED_STATUS": task["completed"],
-                    "TASK_TITLE": task["title"]
-                })
+            csv_writer = csv.writer(csv_file, quoting=csv.QUOTE_MINIMAL)
+            csv_writer.writerow(
+                ["USER_ID", "USERNAME", "TASK_COMPLETED_STATUS", "TASK_TITLE"]
+            )
+            for task in todo_data:
+                csv_writer.writerow(
+                    [user_id, user_name, str(task["completed"]), task["title"]]
+                )
 
         print(f"Data exported to {csv_file_name}")
-    else:
-        print(f"Failed to retrieve data for employee ID {employee_id}")
+    except requests.exceptions.RequestException as e:
+        print(f"Error: {e}")
+        sys.exit(1)
 
-    if __name__ == "__main__":
 
-        """ command-line argument for employee_id. """
-        if len(sys.argv) != 2:
-            print("Usage: python 3 script.py <employee_id>")
-            sys.exit(1)
+if __name__ == "__main__":
+    if len(sys.argv) != 2:
+        print("Usage: python3 1-expoert_tp_CSV.py <employee_id>")
+        sys.exit(1)
 
+    try:
         employee_id = int(sys.argv[1])
-        get_employee_data(employee_id)
+    except ValueError:
+        print("Error: Employe ID must be an integer.")
+        sys.exit(1)
+
+    get_employee_data(employee_id)
