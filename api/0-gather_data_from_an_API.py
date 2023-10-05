@@ -3,12 +3,56 @@
 import requests
 import sys
 
-if __name__ == "__main__":
-    url = "https://jsonplaceholder.typicode.com/"
-    user = requests.get(url + "users/{}".format(sys.argv[1])).json()
-    to_do = requests.get(url + "todos", params={"userId": sys.argv[1]}).json()
 
-    completed = [l.get("title") for l in to_do if l.get("completed") is True]
-    print("Employee {} is done with tasks ({}/{}):".format(user.get("name"),
-          len(completed), len(to_do)))
-    [print("\t {}".format(c)) for c in completed]
+def fetch_employee_data(employee_id):
+    """ Define base url for api """
+    url = "https://jsonplaceholder.typicode.com"
+
+    """ GET request to retrieve employee information. """
+    response = requests.get(f"{url}/users/{employee_id}")
+
+    """ Check if request was successful. """
+    if response.status_code == 200:
+        employee_data = response.json()
+        return employee_data
+    else:
+        print("Error: Unable to fetch employee data.")
+        return None
+
+
+def fetch_todo_list(employee_id):
+    url = "https://jsonplaceholder.typicode.com"
+    response = requests.get(f"{url}/users/{employee_id}/todos")
+
+    if response.status_code == 200:
+        todo_list = response.json()
+        return todo_list
+    else:
+        print("Error: Unable to fetch todo list data.")
+        return None
+
+
+def main():
+    if len(sys.argv) != 2:
+        print("Usage: python3 0-gather_data_from_an_API.py <employee_id>")
+
+        sys.exit(1)
+
+    employee_id = int(sys.argv[1])
+    employee_data = fetch_employee_data(employee_id)
+
+    if employee_data:
+        todo_list = fetch_todo_list(employee_id)
+        if todo_list:
+            completed_tasks = [task for task in todo_list if task["completed"]]
+            num_completed_tasks = len(completed_tasks)
+            total_tasks = len(todo_list)
+
+            print(
+                f"Employee {employee_data['name']} is done with tasks({num_completed_tasks}/{total_tasks}):")
+            for task in completed_tasks:
+                print(f"{task['title']}")
+
+
+if __name__ == "__main__":
+    main()
