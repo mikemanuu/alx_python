@@ -1,27 +1,18 @@
+#!/usr/bin/python3
+"""Returns information about employee's to-do list progress."""
+
 import requests
 import sys
 
+if __name__ == "__main__":
 
-def get_employee_to_do_progress(employee_id):
-    # Get employee details
-    employee_url = f"https://jsonplaceholder.typicode.com/users/1"
-    response_employee = requests.get(employee_url)
-    employee_data = response_employee.json()
-    employee_name = employee_data.get("name")
+    url = "https://jsonplaceholder.typicode.com/"
+    user = requests.get(url + "users/{}".format(sys.argv[1])).json()
+    to_do = requests.get(url + "todos", params={"userId": sys.argv[1]}).json()
 
-    # Get employee's todo list
-    todo_url = f"https://jsonplaceholder.typicode.com/users/1/todos"
-    response_todo = requests.get(todo_url)
-    todo_list = response_todo.json()
+    completed = [l.get("title") for l in to_do if l.get("completed") is True]
 
-    # Calculate progress
-    total_tasks = len(todo_list)
-    completed_tasks = sum(1 for task in todo_list if task["completed"])
-    in_progress_tasks = total_tasks - completed_tasks
+    print("Employee {} is done with tasks ({}/{}):".format(user.get("name"),
+          len(completed), len(to_do)))
 
-    # Display progress
-    print(
-        f"Employee {employee_name} is done with tasks ({completed_tasks}/{total_tasks}):")
-    for task in todo_list:
-        if task["completed"]:
-            print(f"\t{task['title']}")
+    [print("\t {}".format(c)) for c in completed]
