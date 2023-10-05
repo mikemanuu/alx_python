@@ -56,13 +56,12 @@ def get_employee_data(employee_id):
     else:
         print(f"Failed to retrieve data for employee ID {employee_id}")
 
-    # if __name__ == "__main__":
+    if __name__ == "__main__":
 
-        """ command-line argument for employee_id.
+        """ command-line argument for employee_id. """
         if len(sys.argv) != 2:
             print("Usage: python 3 script.py <employee_id>")
             sys.exit(1)
 
         employee_id = int(sys.argv[1])
         get_employee_data(employee_id)
-        """
