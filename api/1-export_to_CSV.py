@@ -10,29 +10,30 @@ if __name__ == "__main__":
     # pass employee id on command line
     id = sys.argv[1]
 
-    todo_url = "https://jsonplaceholder.typicode.com/users/{}/todos".format(id)
-    user_url = "https://jsonplaceholder.typicode.com/users/{}".format(id)
+    userTodoURL = "https://jsonplaceholder.typicode.com/users/{}/todos".format(
+        id)
+    userProfile = "https://jsonplaceholder.typicode.com/users/{}".format(id)
 
     # Make api requeats
-    todo_response = requests.get(todo_url)
-    user_response = requests.get(user_url)
+    todoResponse = requests.get(userTodoURL)
+    profileResponse = requests.get(userProfile)
 
     # Parse responses
-    todoJson_data = todo_response.json()
-    userJson_data = user_response.json()
+    todoJson_Data = todoResponse.json()
+    profileJson_Data = profileResponse.json()
 
     # get employee information
-    employee_id = userJson_data['username']
+    employeeName = profileJson_Data['username']
 
     dataList = []
 
-    for data in todoJson_data:
-        data_dict = {"userId": data['userId'], "name": employee_id,
-                     "completed": data['completed'], "ttitle": data['title']}
-        dataList.append(data_dict)
+    for data in todoJson_Data:
+        dataDict = {"userId": data['userId'], "name": employeeName,
+                    "completed": data['completed'], "ttitle": data['title']}
+        dataList.append(dataDict)
 
     # csv file path
-    csv_file_path = '{}.csv'.format(todoJson_data[0]['userId'])
+    csv_file_path = '{}.csv'.format(todoJson_Data[0]['userId'])
 
     # Define filed namwe column headers
     fieldnames = ["userId", "name", "completed", "title"]
