@@ -5,43 +5,30 @@ import csv
 import requests
 import sys
 
+
+def fetch_tasks(user_id):
+    url = f"https://jsonplaceholder.typicode.com/users/1/todos?userId={user_id}"
+    response = requests.get(url)
+    tasks = response.json()
+    return tasks
+
+
+def export_to_csv(user_id, tasks):
+    filename = f"{user_id}.csv"
+    with open(filename, mode='w', newline='') as csv_file:
+        fieldnames = ["USER_ID", "USERNAME",
+                      "TASK_COMPLETED_STATUS", "TASK_TITLE"]
+        writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
+        writer.writerow()
+
+        for task in tasks:
+            writer.writerow({"USER_ID": user_id, "USERNAME": "Antonette", "TASK_COMPLETED_STATUS": atr(
+                task['completed']), "TASK_TITLE": task['title']})
+
+
 if __name__ == "__main__":
+    if len(sys.argv) != 2:
+        print("Usage: python 3 1-export_to_CSV.py <user_id>")
+        sys.exit(1)
 
-    # pass employee id on command line
-    id = sys.argv[1]
-
-    userTodoURL = "https://jsonplaceholder.typicode.com/users/{}/todos".format(
-        id)
-    userProfile = "https://jsonplaceholder.typicode.com/users/{}".format(id)
-
-    # Make api requeats
-    todoResponse = requests.get(userTodoURL)
-    profileResponse = requests.get(userProfile)
-
-    # Parse responses
-    todoJson_Data = todoResponse.json()
-    profileJson_Data = profileResponse.json()
-
-    # get employee information
-    employeeName = profileJson_Data['username']
-
-    dataList = []
-
-    for data in todoJson_Data:
-        dataDict = {"userId": data['userId'], "name": employeeName,
-                    "completed": data['completed'], "ttitle": data['title']}
-        dataList.append(dataDict)
-
-    # csv file path
-    csv_file_path = '{}.csv'.format(todoJson_Data[0]['userId'])
-
-    # Define filed namwe column headers
-    fieldnames = ["userId", "name", "completed", "title"]
-
-    # open csv in write mode
-    with open(csv_file_path, 'w', newline='') as csv_file:
-        csv_writer = csv.DictWriter(
-            csv_file, fieldnames=fieldnames, quoting=csv.QUOTE_ALL)
-
-        for row in dataList:
-            csv_writer.writerow(row)
+    user_id = sys.argv[1]
