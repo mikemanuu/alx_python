@@ -3,30 +3,16 @@
 
 import json
 import requests
-from sys import argv
+
+API_URL = 'https://jsonplaceholder.typicode.com'
 
 if __name__ == "__main__":
-    user_id = argv[1]
-    user_url = "https://jsonplaceholder.typicode.com/users/{}".format(user_id)
-    user_response = requests.get(user_url)
-    user_data = user_response.json()
-    username = user_data.get("username")
-
-    tasks_url = "https://jsonplaceholder.typicode.com/todos?userId={}".format(
-        user_id)
-    tasks_response = requests.get(tasks_url)
-    tasks_data = tasks_response.json()
-
-    user_tasks = []
-    for task in tasks_data:
-        user_tasks.append(
-            {
-                "username": username,
-                "tasks": task.get("completed"),
-            }
-        )
-    todo_dict = {user_id: user_tasks}
-
-    # Export data to json
-    with open("{}.json".format(user_id), "w") as json_file:
-        json.dump(todo_dict, json_file)
+    users_res = requests.get('{}/users'.format(API_URL)).json()
+    todos_res = requests.get('{}/todos'.format(API_URL)).json()
+    users_data = {}
+    for user in users_res:
+        id = user.get('id')
+        user_name = user.get('username')
+        todos = list(filter(lambda x: x.get('userId') == id, todos_res))
+        user_data = list(map(lambda x: {'username': user_name, 'task': x.get(
+            'title'), 'completed': x.get('completed')}, todos))
