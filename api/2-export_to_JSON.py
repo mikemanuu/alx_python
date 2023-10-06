@@ -47,7 +47,7 @@ def get_employee_data(employee_id):
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:
-        print("Usage: python 3 script.py <employee>")
+        print("Usage: python 3 script.py <employee_id>")
         sys.exit(1)
 
     employee_id = int(sys.argv[1])
