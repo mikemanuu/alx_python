@@ -5,30 +5,14 @@ import csv
 import requests
 import sys
 
-
-def fetch_tasks(user_id):
-    url = f"https://jsonplaceholder.typicode.com/users/1/todos?userId={user_id}"
-    response = requests.get(url)
-    tasks = response.json()
-    return tasks
-
-
-def export_to_csv(user_id, tasks):
-    filename = f"{user_id}.csv"
-    with open(filename, mode='w', newline='') as csv_file:
-        fieldnames = ["USER_ID", "USERNAME",
-                      "TASK_COMPLETED_STATUS", "TASK_TITLE"]
-        writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
-        writer.writerow()
-
-        for task in tasks:
-            writer.writerow({"USER_ID": user_id, "USERNAME": "Antonette", "TASK_COMPLETED_STATUS": atr(
-                task['completed']), "TASK_TITLE": task['title']})
-
-
 if __name__ == "__main__":
-    if len(sys.argv) != 2:
-        print("Usage: python 3 1-export_to_CSV.py <user_id>")
-        sys.exit(1)
+    user_id = "https://jsonplaceholder.typicode.com/"
+    user = requests.get(url + "users/{}".format(user_id)).json()
+    username = user.get("username")
+    todos = requests.get(url + "todos", params={"userId": user_id}).json()
 
-    user_id = sys.argv[1]
+    with open("{}.csv".format(user_id), "w", newline="\n") as csv_file:
+        writer = csv.writer(csv_file, quoting=csv.QUOTE_ALL)
+        [writer.writerow([user_id, username, t.get(
+            "completed"), t.get("title")]) for t in todos]
+__doc__ = """doc for module"""
