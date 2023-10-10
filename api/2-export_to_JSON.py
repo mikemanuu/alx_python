@@ -5,50 +5,24 @@ import json
 import requests
 import sys
 
-
-def get_employee_data(employee_id):
-    """
-    Fetches employee data and their todo list, then exports it to a json file.
-    Args:
-        employee_id(int): The id of the employee for whom data is to be fetched and exported.
-    Retruns: None
-    """
-
-    employee = f"https://jsonplaceholder.typicode.com/users/{employee_id}"
-    to_do = f"https://jsonplaceholder.typicode.com/users/{employee_id}/todos"
-
-    employee_response = requests.get(employee)
-    to_do_response = requests.get(to_do)
-
-    if employee_response.status_code == 200 and to_do_response.status_code == 200:
-        employee_data = employee_response.json()
-        to_do_data = to_do_response.json()
-
-        json_data = {
-            "USER_ID": [
-                {
-                    "task": task["title"],
-                    "completed": task["completed"],
-                    "username": employee_data["username"]
-                }
-                for task in to_do_data
-            ]
-        }
-
-        json_file_name = f"{employee_id}.json"
-        with open(json_file_name, 'w') as json_file:
-            json.dump(json_data, json_file, indent=4)
-
-        print(f"Data exported to {json_file_name}")
-
-    else:
-        print(f"Failed to retreive data for employee ID {employee_id}")
+from requests.api import request
 
 
 if __name__ == "__main__":
-    if len(sys.argv) != 2:
-        print("Usage: python 3 script.py <employee_id>")
-        sys.exit(1)
+    employeeId = sys.argv[1]
+    baseUrl = "https://jsonplaceholder.typicode.com/users"
+    url = baseUrl + "/" + employeeId
 
-    employee_id = int(sys.argv[1])
-    get_employee_data(employee_id)
+    response = requests.get(url)
+    username = response.json().get('username')
+
+    todoUrl = url + "/todos"
+    response = requests.get(todoUrl)
+    tasks = response.json()
+
+    dictionary = {employeeId: []}
+    for task in tasks:
+        dictionary[employeeId].append({"task": task.get(
+            'title'), "completed": task.get('completed'), "username": username})
+    with open('{}.json'.format(employeeId), 'w') as filename:
+        json.dump(dictionary, filename)
