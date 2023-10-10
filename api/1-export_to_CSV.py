@@ -5,24 +5,39 @@ import csv
 import requests
 import sys
 
-if __name__ == "__main__":
 
-    user_id = sys.argv[1]
+def get_employee_todo_progress(employee_id):
+    # Get employee details
+    employee_url = f"https://jsonplaceholder.typicode.com/users/{employee_id}"
+    response_employee = requests.get(employee_url)
+    employee_data = response_employee.json()
+    user_id = employee_data.get("id")
+    username = employee_data.get("username")
 
-    user_url = "https://jsonplaceholder.typicode.com/users/{}".format(user_id)
-    user_response = requests.get(user_url)
-    user_data = user_response.json()
+    # Get employee's todo list
+    todo_url = f"https://jsonplaceholder.typicode.com/users/{employee_id}/todos"
+    response_todo = requests.get(todo_url)
+    todo_list = response_todo.json()
 
-    todo_url = "https://jsonplaceholder.typicode.com/users/{}/todos".format(
-        user_id)
-    todo_response = requests.get(user_url)
-    todo_data = todo_response.json()
+    # Create a CSV file
+    csv_file_name = f"{user_id}.csv"
+    with open(csv_file_name, mode='w', newline='') as csv_file:
+        csv_writer = csv.writer(csv_file)
+        csv_writer.writerow(
+            ["USER_ID", "USERNAME", "TASK_COMPLETED_STATUS", "TASK_TITLE"])
 
-    csv_file = "{}.csv".format(user_id)
-
-    with open(csv_file, 'w') as csvfile:
-        csv_writer = csv.writer(csvfile)
-        for task in todo_data:
+        # Write todo list data to CSV
+        for task in todo_list:
+            task_completed_status = "Completed" if task["completed"] else "Not Completed"
             csv_writer.writerow(
-                [user_id, str(user_data['username']), task['completed'], task['title']])
-        csvfile.close()
+                [user_id, username, task_completed_status, task["title"]])
+
+    print(f"Data exported to {csv_file_name}")
+
+
+if __name__ == "__main__":
+    if len(sys.argv) != 2:
+        print("Usage: python script.py <employee_id>")
+    else:
+        employee_id = int(sys.argv[1])
+        get_employee_todo_progress(employee_id)
