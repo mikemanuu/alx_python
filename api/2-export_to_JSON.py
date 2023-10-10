@@ -17,7 +17,7 @@ for user_id in range(1, 11):
             'title'), "completed": item.get('completed')})
 
     all_tasks[str(user_id)] = tasks
-json_file = "todo_all_employees.json"
+json_file = "2.json"
 
 with open(json_file, mode='w') as file:
     json.dump(all_tasks, file)
