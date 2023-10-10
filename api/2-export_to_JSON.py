@@ -3,23 +3,21 @@
 
 import json
 import requests
-import sys
 
-if __name__ == "__main__":
-    employeeId = sys.argv[1]
-    baseUrl = "https://jsonplaceholder.typicode.com/users"
-    url = baseUrl + "/" + employeeId
+all_tasks = {}
+for user_id in range(1, 11):
+    request = requests.get(
+        f'https://jsonplaceholder.typicode.com/users/{user_id}/todos')
+    data = request.json()
 
-    response = requests.get(url)
-    username = response.json().get('username')
+    tasks = []
 
-    todoUrl = url + "/todos"
-    response = requests.get(todoUrl)
-    tasks = response.json()
+    for item in data:
+        tasks.append({"username": f"USER_{user_id}", "task": item.get(
+            'title'), "completed": item.get('completed')})
 
-    dictionary = {employeeId: []}
-    for task in tasks:
-        dictionary[employeeId].append({"task": task.get(
-            'title'), "completed": task.get('completed'), "username": username})
-    with open('{}.json'.format(employeeId), 'w') as filename:
-        json.dump(dictionary, filename)
+    all_tasks[str(user_id)] = tasks
+json_file = "todo_all_employees.json"
+
+with open(json_file, mode='w') as file:
+    json.dump(all_tasks, file)
