@@ -7,33 +7,22 @@ import sys
 
 if __name__ == "__main__":
 
-    id = sys.argv[1]
+    user_id = sys.argv[1]
 
-    userTodoURL = "https://jsonplaceholder.typicode.com/users/{}/todos".format(
-        id)
-    userProfile = "https://jsonplaceholder.typicode.com/users/{}".format(id)
+    user_url = "https://jsonplaceholder.typicode.com/users/{}".format(user_id)
+    user_response = requests.get(user_url)
+    user_data = user_response.json()
 
-    todoResponse = requests.get(userTodoURL)
-    profileResponse = requests.get(userProfile)
+    todo_url = "https://jsonplaceholder.typicode.com/users/{}/todos".format(
+        user_id)
+    todo_response = requests.get(user_url)
+    todo_data = todo_response.json()
 
-    todoJson_Data = todoResponse.json()
-    profileJson_Data = profileResponse.json()
+    csv_file = "{}.csv".format(user_id)
 
-    employeeName = profileJson_Data['username']
-
-    dataList = []
-
-    for data in todoJson_Data:
-        dataDict = {"userId": data['userId'], "name": employeeName,
-                    "completed": data['completed'], "title": data['title']}
-        dataList.append(dataDict)
-
-    csv_file_path = '{}.csv'.format(todoJson_Data[0]['userId'])
-
-    fieldnames = ["userId", "name", "completed", "title"]
-
-    with open(csv_file_path, 'w', newline='') as csv_file:
-        csv_writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
-
-        for row in dataList:
-            csv_writer.writerow(row)
+    with open(csv_file, 'w') as csvfile:
+        csv_writer = csv.writer(csvfile)
+        for task in todo_data:
+            csv_writer.writerow(
+                [user_id, str(user_data['username']), task['completed'], task['title']])
+        csvfile.close()
