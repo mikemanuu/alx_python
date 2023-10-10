@@ -9,7 +9,7 @@ import sys
 if __name__ == "__main__":
 
     # Pass employee id on command line
-    id = sys.argv[0]
+    id = sys.argv[1]
 
 # API
     userTodoURL = "https://jsonplaceholder.typicode.com/users/1/todos".format(

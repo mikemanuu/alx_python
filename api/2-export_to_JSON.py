@@ -5,9 +5,6 @@ import json
 import requests
 import sys
 
-from requests.api import request
-
-
 if __name__ == "__main__":
     employeeId = sys.argv[1]
     baseUrl = "https://jsonplaceholder.typicode.com/users"
