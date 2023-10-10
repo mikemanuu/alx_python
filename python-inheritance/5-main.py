@@ -2,6 +2,7 @@
 BaseGeometry = __import__('5-base_geometry').BaseGeometry
 
 bg = BaseGeometry()
+print(dir(bg))
 
 bg.integer_validator("my_init", 12)
 bg.integer_validator("width", 89)
