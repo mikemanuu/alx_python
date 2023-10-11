@@ -35,5 +35,5 @@ class Rectangle(BaseGeometry, metaclass=CustomDirMeta):
     def __str__(self):
         """ Retutn print() and str() representation of rectangle. """
         string = "[" + str(self.__class__.__name__) + "]"
-        string += str(self.__width) + "/" + str(self.__height)
+        string += str(self.__width) + "," + str(self.__height)
         return string
