@@ -1,49 +1,55 @@
 #!/usr/bin/python3
 """ Exports data in the CSV format. """
-
 import csv
+import os
 import requests
 import sys
 
-# Not executed
+
+def user_info(employee_id):
+    # Fetch employee information
+    employee_response = requests.get(
+        f"https://jsonplaceholder.typicode.com/users/{employee_id}")
+    if employee_response.status_code != 200:
+        print("Error: Unable to fetch employee data.")
+        return
+
+    employee_data = employee_response.json()
+    employee_name = employee_data.get("name", "Unknown Employee")
+    employee_username = employee_data.get("username", "Unknown Username")
+
+    # Fetch employee's tasks
+    todos_response = requests.get(
+        f"https://jsonplaceholder.typicode.com/todos?userId={employee_id}")
+    if todos_response.status_code != 200:
+        print(f"Error: Unable to fetch tasks for employee ID {employee_id}.")
+        return
+
+    todo_data = todos_response.json()
+
+    # Create csv
+    csv_filename = f"{employee_id}.csv"
+
+    with open(csv_filename, mode='w', newline="") as csv_file:
+        csv_writer = csv.writer(csv_file)
+        csv_writer.writerow(
+            ["USER_ID", "USERNAME", "TASK_COMPLETED_STATUS", "TASK_TITLE"])
+
+        for task in todo_data:
+            task_completed_status = "Completed" if task["completed"] else "Not Completed"
+            csv_writer.writerow(
+                [employee_name, employee_username, task_completed_status, task["title"]])
+
+    print(f"CSV file '{csv_filename}' created successfully.")
+
+
 if __name__ == "__main__":
+    if len(sys.argv) != 2:
+        print("Usage: python3 main_o.py <employee_id>")
+        sys.exit(1)
 
-    # Pass employee id on command line
-    id = sys.argv[1]
-
-# API
-    userTodoURL = "https://jsonplaceholder.typicode.com/users/1/todos".format(
-        id)
-    userProfile = "https://jsonplaceholder.typicode.com/users/1".format(id)
-
-# APIs requests
-    todoResponse = requests.get(userTodoURL)
-    profileResponse = requests.get(userProfile)
-
-# Parse responses
-    todoJson_Data = todoResponse.json()
-    profileJson_Data = profileResponse.json()
-
-# Get employee information
-    employeeName = profileJson_Data['username']
-
-    dataList = []
-
-    for data in todoJson_Data:
-        dataDict = {"userId": data['userId'], "name": employeeName,
-                    "completed": data['completed'], "title": data['title']}
-        dataList.append(dataDict)
-
-# Specify csv filepath
-    csv_file_path = '{}.csv'.format(todoJson_Data[0]['userId'])
-
-# Define the fieldnames
-    fieldnames = ["userId", "name", "completed", "title"]
-
-# Open csvfile in write mode
-    with open(csv_file_path, 'w', newline='') as csv_file:
-        csv_writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
-
-# Write data rows
-        for row in dataList:
-            csv_writer.writerow(row)
+    try:
+        employee_id = int(sys.argv[1])
+        user_info(employee_id)
+    except ValueError:
+        print("Error: Employee ID must be an integer.")
