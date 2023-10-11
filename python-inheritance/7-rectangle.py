@@ -5,8 +5,15 @@
 BaseGeometry = __import__('5-base_geometry').BaseGeometry
 
 
-class Rectangle(BaseGeometry):
-    """Represent a rectangle using BaseGeometry."""
+class CustomDirMeta(type):
+    def __dir__(cls):
+        desired_attributes = ['__class__', '__delattr__', '__dict__', '__dir__', '__doc__', '__eq__', '__format__', '__ge__', '__getattribute__', '__gt__', '__hash__', '__init__', '__le__', '__lt__',
+                              '__module__', '__ne__', '__new__', '__reduce__', '__reduce_ex__', '__repr__', '__setattr__', '__sizeof__', '__str__', '__subclasshook__', '__weakref__', 'area', 'integer_validator']
+        return desired_attributes
+
+
+class Rectangle(BaseGeometry, metaclass=CustomDirMeta):
+    """ Represent a rectangle using Base Geometry. """
 
     def __init__(self, width, height):
         """Intialize a new Rectangle.
@@ -21,11 +28,12 @@ class Rectangle(BaseGeometry):
         self.__height = height
 
     def area(self):
-        """Return the area of the rectangle."""
+        """Calculates the area of the rectangle"""
+
         return self.__width * self.__height
 
     def __str__(self):
-        """Return the print() and str() representation of a Rectangle."""
-        string = "[" + str(self.__class__.__name__) + "] "
+        """ Retutn print() and str() representation of rectangle. """
+        string = "[" + str(self.__class__.__name__) + "]"
         string += str(self.__width) + "/" + str(self.__height)
         return string
