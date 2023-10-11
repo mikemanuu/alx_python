@@ -1,7 +1,5 @@
 #!/usr/bin/python3
-
 """Defines a class Rectangle that inherits from BaseGeometry."""
-
 BaseGeometry = __import__('5-base_geometry').BaseGeometry
 
 
@@ -29,7 +27,6 @@ class Rectangle(BaseGeometry, metaclass=CustomDirMeta):
 
     def area(self):
         """Calculates the area of the rectangle"""
-
         return self.__width * self.__height
 
     def __str__(self):
