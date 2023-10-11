@@ -22,6 +22,7 @@ def hbnb():
 @app.route('/c/<text>', strict_slashes=False)
 def display_custom_text(text):
     # display C with text to the user
+    text = text.replace('_', ' ')
     return f"C {text}"
 
 
