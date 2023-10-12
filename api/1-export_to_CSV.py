@@ -1,16 +1,22 @@
 #!/usr/bin/python3
 """ Exports data in the CSV format. """
 import csv
-import os
 import requests
 import sys
+import logging
+
+# Configure logging
+logging.basicConfig(filename='export_data.log', level=logging.INFO)
 
 
 def user_info(employee_id):
     # Fetch employee information
-    employee_response = requests.get(
-        f"https://jsonplaceholder.typicode.com/users/{employee_id}")
-    if employee_response.status_code != 200:
+    try:
+        employee_response = requests.get(
+            f"https://jsonplaceholder.typicode.com/users/{employee_id}")
+        employee_response.raise_for_status()
+    except requests.exceptions.RequestException as e:
+        logging.error(f"Error fetching employee data: {e}")
         print("Error: Unable to fetch employee data.")
         return
 
@@ -19,18 +25,22 @@ def user_info(employee_id):
     employee_username = employee_data.get("username", "Unknown Username")
 
     # Fetch employee's tasks
-    todos_response = requests.get(
-        f"https://jsonplaceholder.typicode.com/todos?userId={employee_id}")
-    if todos_response.status_code != 200:
+    try:
+        todos_response = requests.get(
+            f"https://jsonplaceholder.typicode.com/todos?userId={employee_id}")
+        todos_response.raise_for_status()
+    except requests.exceptions.RequestException as e:
+        logging.error(
+            f"Error fetching tasks for employee ID {employee_id}: {e}")
         print(f"Error: Unable to fetch tasks for employee ID {employee_id}.")
         return
 
     todo_data = todos_response.json()
 
-    # Create csv
+    # Create CSV
     csv_filename = f"{employee_id}.csv"
 
-    with open(csv_filename, mode='w', newline="") as csv_file:
+    with open(csv_filename, mode='w', newline="", encoding='utf-8') as csv_file:
         csv_writer = csv.writer(csv_file)
         csv_writer.writerow(
             ["USER_ID", "USERNAME", "TASK_COMPLETED_STATUS", "TASK_TITLE"])
@@ -38,12 +48,12 @@ def user_info(employee_id):
         for task in todo_data:
             task_completed_status = "Completed" if task["completed"] else "Not Completed"
             csv_writer.writerow(
-                [employee_name, employee_username, task_completed_status, task["title"]])
+                [employee_id, employee_username, task_completed_status, task["title"]])
 
     print(f"CSV file '{csv_filename}' created successfully.")
 
 
-if __name__ == "__main__":
+if __name__ == "__main":
     if len(sys.argv) != 2:
         print("Usage: python3 main_o.py <employee_id>")
         sys.exit(1)
@@ -53,3 +63,4 @@ if __name__ == "__main__":
         user_info(employee_id)
     except ValueError:
         print("Error: Employee ID must be an integer.")
+        logging.error("Error: Employee ID must be an integer.")
