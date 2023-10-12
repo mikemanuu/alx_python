@@ -1,9 +1,9 @@
 #!/usr/bin/python3
 """ Exports data in the CSV format. """
 import csv
+import logging
 import requests
 import sys
-import logging
 
 # Configure logging
 logging.basicConfig(filename='export_data.log', level=logging.INFO)
